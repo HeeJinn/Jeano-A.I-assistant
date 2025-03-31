@@ -39,19 +39,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp // <-- Import dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.jeano.MyApp
 import com.example.jeano.R
 import com.example.jeano.model.MessageModel
 import com.example.jeano.ui.theme.BacksoFamily
@@ -63,14 +64,19 @@ import com.example.jeano.ui.theme.OldMauve
 import com.example.jeano.ui.theme.PoppinsFamily
 import com.example.jeano.ui.theme.White
 import com.example.jeano.viewmodel.JeanoChatViewModel
+import com.example.jeano.viewmodel.JeanoChatViewModelFactory
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun JeanoChatScreen(
 navController: NavController,
-    jeanoChatViewModel: JeanoChatViewModel = viewModel()
 ){
+    val application = LocalContext.current.applicationContext as MyApp
+    val jeanoChatViewModel : JeanoChatViewModel =viewModel(factory = JeanoChatViewModelFactory(application.repository))
+    val messageList = jeanoChatViewModel.allMessages.collectAsStateWithLifecycle()
+
+    val isTyping by jeanoChatViewModel.isTyping.collectAsStateWithLifecycle()
     var question by remember { mutableStateOf("") }
     var isBackButtonEnabled by remember { mutableStateOf(true) }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -121,7 +127,8 @@ navController: NavController,
             MessageList(
                 modifier = Modifier
                     .weight(1f),
-                jeanoChatViewModel.messageList)
+                messageList.value)
+
             TextFieldWithSendButton(
                 question = question,
                 onValueChange = {
@@ -177,7 +184,7 @@ fun MessageList(modifier: Modifier = Modifier, messageList: List<MessageModel>){
 
 @Composable
 fun MessageRow(messageModel: MessageModel){
-    val isModel = messageModel.role == "model"
+    var isModel = messageModel.role == "model"
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
