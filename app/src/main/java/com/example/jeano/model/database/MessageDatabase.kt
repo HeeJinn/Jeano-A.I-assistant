@@ -4,11 +4,13 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.jeano.model.BreiahMessageModel
+import com.example.jeano.model.LeeMessageModel
 import com.example.jeano.model.MessageModel
 import com.example.jeano.model.dao.MessageDao
 import kotlin.contracts.Returns
 
-@Database(entities = [MessageModel::class], version = 1, exportSchema = false)
+@Database(entities = [MessageModel::class, BreiahMessageModel::class, LeeMessageModel::class], version = 1, exportSchema = false)
 abstract class MessageDatabase: RoomDatabase() {
     abstract fun messageDao(): MessageDao
 
@@ -27,5 +29,4 @@ abstract class MessageDatabase: RoomDatabase() {
             }
         }
     }
-
 }

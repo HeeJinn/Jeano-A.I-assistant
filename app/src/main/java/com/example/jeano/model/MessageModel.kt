@@ -10,3 +10,17 @@ data class MessageModel(
     @ColumnInfo(name = "message") val message : String,
     @ColumnInfo(name = "role") val role : String
 )
+
+@Entity(tableName = "breaih_messages")
+data class BreiahMessageModel(
+    @PrimaryKey(autoGenerate = true) val id: Int,
+    @ColumnInfo(name = "breiah_message") val message : String,
+    @ColumnInfo(name = "breiah_role") val role : String
+)
+
+@Entity(tableName = "lee_messages")
+data class LeeMessageModel(
+    @PrimaryKey(autoGenerate = true) val id: Int,
+    @ColumnInfo(name = "lee_message") val message : String,
+    @ColumnInfo(name = "lee_role") val role : String
+)

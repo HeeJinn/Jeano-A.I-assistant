@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.jeano.model.BreiahMessageModel
+import com.example.jeano.model.LeeMessageModel
 import com.example.jeano.model.MessageModel
 import com.example.jeano.model.repository.MessageRepository // Ensure correct repository import
 import com.google.ai.client.generativeai.Chat // Import Chat if you want persistent chat object
@@ -30,12 +32,31 @@ class JeanoChatViewModel(private val messageRepository: MessageRepository) : Vie
             started = SharingStarted.WhileSubscribed(5000L),
             initialValue = emptyList()
         )
-
+    val allBreaihMessages: StateFlow<List<BreiahMessageModel>> = messageRepository.allBreiahMessages
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = emptyList()
+        )
+    val allLeeMessages : StateFlow<List<LeeMessageModel>> = messageRepository.allLeeMessages
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = emptyList()
+        )
 
     private val _isTyping = MutableStateFlow(false)
     val isTyping: StateFlow<Boolean> = _isTyping.asStateFlow()
 
-    val queryContext = "You are a Professional Teacher, always reply in manners"
+    private val _breiahIsTyping = MutableStateFlow(false)
+    val breiahIsTyping: StateFlow<Boolean> = _breiahIsTyping.asStateFlow()
+
+    private val _leeIsTyping = MutableStateFlow(false)
+    val leeIsTyping: StateFlow<Boolean> = _leeIsTyping.asStateFlow()
+
+    val queryContext = "The Context is You are a Professional Teacher named as Jeano its a roleplay character, always reply in manners. Your scope is General Knowledge."
+    val breiahQueryContext = "The Context is You are a Professional Teacher named as Breiah. its a roleplay character, always reply in manners. Your scope is All Work Related Knowledge."
+    val leeQueryContext = "The Context is You are a Professional Teacher named as Kenley. its a roleplay character, always reply in manners. Your scope is All Programming related knowledge."
 
     private val generativeModel: GenerativeModel = GenerativeModel(
         modelName = "gemini-1.5-flash",
@@ -45,6 +66,76 @@ class JeanoChatViewModel(private val messageRepository: MessageRepository) : Vie
     private fun insertMessage(message: MessageModel) {
         viewModelScope.launch(Dispatchers.IO) {
             messageRepository.insertMessage(message)
+        }
+    }
+    private fun insertBreiahMessage(message: BreiahMessageModel) {
+        viewModelScope.launch(Dispatchers.IO) {
+            messageRepository.insertBreiahMessage(message)
+        }
+    }
+    private fun insertLeeMessage(message: LeeMessageModel) {
+        viewModelScope.launch(Dispatchers.IO) {
+            messageRepository.insertLeeMessage(message)
+        }
+    }
+    fun sendLeeQuestion(question: String) {
+        val userMessageContent = question.trim()
+        insertLeeMessage(LeeMessageModel(0, userMessageContent, "user"))
+
+        _leeIsTyping.value = true
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val currentHistory = allLeeMessages.value.map {
+                    content(it.role) { text(it.message) }
+                }
+                val chat = generativeModel.startChat(history = currentHistory)
+
+                val response = chat.sendMessage("context is: $leeQueryContext, question is: $userMessageContent")
+                Log.d("ViewModelAI", "API call finished.")
+                _leeIsTyping.value = false
+
+                val modelResponseText = response.text?.trim()
+
+                if (!modelResponseText.isNullOrBlank()) {
+                    insertLeeMessage(LeeMessageModel(0, modelResponseText, "model"))
+                }
+
+            } catch (e: Exception) {
+                Log.e("ViewModelAI", "API Error: ${e.message}", e)
+                _leeIsTyping.value = false
+                insertLeeMessage(LeeMessageModel(0, "Error: ${e.message}", "model"))
+            }
+        }
+    }
+    fun sendBreaihQuestion(question: String) {
+        val userMessageContent = question.trim()
+        insertBreiahMessage(BreiahMessageModel(0, userMessageContent, "user"))
+
+        _breiahIsTyping.value = true
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val currentHistory = allBreaihMessages.value.map {
+                    content(it.role) { text(it.message) }
+                }
+                val chat = generativeModel.startChat(history = currentHistory)
+
+                val response = chat.sendMessage("context is: $breiahQueryContext, question is: $userMessageContent")
+                Log.d("ViewModelAI", "API call finished.")
+                _breiahIsTyping.value = false
+
+                val modelResponseText = response.text?.trim()
+
+                if (!modelResponseText.isNullOrBlank()) {
+                    insertBreiahMessage(BreiahMessageModel(0, modelResponseText, "model"))
+                }
+
+            } catch (e: Exception) {
+                Log.e("ViewModelAI", "API Error: ${e.message}", e)
+                _breiahIsTyping.value = false
+                insertBreiahMessage(BreiahMessageModel(0, "Error: ${e.message}", "model"))
+            }
         }
     }
 
@@ -62,6 +153,7 @@ class JeanoChatViewModel(private val messageRepository: MessageRepository) : Vie
                 val chat = generativeModel.startChat(history = currentHistory)
 
                 val response = chat.sendMessage("context is: $queryContext, question is: $userMessageContent")
+                Log.d("ViewModelAI", "API call finished.")
                 _isTyping.value = false
 
                 val modelResponseText = response.text?.trim()
@@ -71,8 +163,8 @@ class JeanoChatViewModel(private val messageRepository: MessageRepository) : Vie
                 }
 
             } catch (e: Exception) {
-                _isTyping.value = false
                 Log.e("ViewModelAI", "API Error: ${e.message}", e)
+                _isTyping.value = false
                 insertMessage(MessageModel(0, "Error: ${e.message}", "model"))
             }
         }

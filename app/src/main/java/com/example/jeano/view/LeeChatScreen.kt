@@ -1,10 +1,7 @@
 package com.example.jeano.view
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,10 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -40,7 +35,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -52,7 +46,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -62,53 +55,50 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp // <-- Import dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import androidx.room.util.TableInfo
 import com.example.jeano.MyApp
 import com.example.jeano.R
-import com.example.jeano.model.MessageModel
+import com.example.jeano.model.BreiahMessageModel
+import com.example.jeano.model.LeeMessageModel
 import com.example.jeano.navigations.Screens
 import com.example.jeano.ui.theme.BacksoFamily
-import com.example.jeano.ui.theme.Black
 import com.example.jeano.ui.theme.ChinaPink
+import com.example.jeano.ui.theme.GreenAppleAccentLightGreen
+import com.example.jeano.ui.theme.GreenAppleBackground
 import com.example.jeano.ui.theme.IntroFamily
-import com.example.jeano.ui.theme.JeanoTheme
-import com.example.jeano.ui.theme.MidnightDusk_Background
-import com.example.jeano.ui.theme.MidnightDusk_GreenAccent
-import com.example.jeano.ui.theme.MidnightDusk_GreyElement
-import com.example.jeano.ui.theme.MidnightDusk_PinkAccent
 import com.example.jeano.ui.theme.OldMauve
 import com.example.jeano.ui.theme.PoppinsFamily
 import com.example.jeano.ui.theme.White
+import com.example.jeano.ui.theme.YotsubaDarkBackground
+import com.example.jeano.ui.theme.YotsubaPeach
+import com.example.jeano.ui.theme.YotsubaYellow
 import com.example.jeano.viewmodel.JeanoChatViewModel
 import com.example.jeano.viewmodel.JeanoChatViewModelFactory
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun JeanoChatScreen(
-navController: NavController,
-){
+fun LeeChatScreen(navController: NavController){
+
     val application = LocalContext.current.applicationContext as MyApp
     val jeanoChatViewModel : JeanoChatViewModel =viewModel(factory = JeanoChatViewModelFactory(application.repository))
-    val messageList = jeanoChatViewModel.allMessages.collectAsStateWithLifecycle()
+    val messageList = jeanoChatViewModel.allLeeMessages.collectAsStateWithLifecycle()
 
     var openBottomSheet by remember { mutableStateOf(false) }
     var isActionIconEnabled by remember { mutableStateOf(true) }
     var bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     var isIconModelenabled by remember { mutableStateOf(true) }
 
-    val isTyping by jeanoChatViewModel.isTyping.collectAsStateWithLifecycle()
+    val isTyping by jeanoChatViewModel.leeIsTyping.collectAsStateWithLifecycle()
+
     var question by remember { mutableStateOf("") }
     var isBackButtonEnabled by remember { mutableStateOf(true) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
@@ -121,7 +111,7 @@ navController: NavController,
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(MidnightDusk_Background.value)
+                    containerColor = YotsubaDarkBackground
                 ),
                 navigationIcon = {
                     IconButton(
@@ -131,14 +121,14 @@ navController: NavController,
                             navController.popBackStack()
                         }
                     ) {
-                        Icon(imageVector = Icons.Rounded.KeyboardArrowLeft, contentDescription = "back icon", tint = MidnightDusk_PinkAccent, modifier = Modifier.size(100.dp))
+                        Icon(imageVector = Icons.Rounded.KeyboardArrowLeft, contentDescription = "back icon", tint = White, modifier = Modifier.size(100.dp))
                     }
                 },
                 title = {
                     Text(
-                        text = "Jeano",
+                        text = "Lee Minhoo",
                         fontFamily = IntroFamily,
-                        color = MidnightDusk_PinkAccent,
+                        color = White
                     )
                 },
                 actions = {
@@ -149,32 +139,32 @@ navController: NavController,
                             openBottomSheet = true
 
                         }
-                    ) {Icon(imageVector = Icons.Rounded.Face, contentDescription = "ai_models", tint = MidnightDusk_PinkAccent) }
+                    ) {Icon(imageVector = Icons.Rounded.Face, contentDescription = "ai_models", tint = YotsubaPeach) }
                 }
             )
         }
-    ) { paddingValues ->
+    ){paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MidnightDusk_Background)
+                .background(YotsubaDarkBackground)
                 .padding(paddingValues)
 
-        ) {
-            MessageList(
+        ){
+            LeeMessageList(
                 modifier = Modifier
                     .weight(1f),
                 messageList.value,
                 isTyping)
 
-            TextFieldWithSendButton(
+            LeeTextFieldWithSendButton(
                 question = question,
                 onValueChange = {
                     question = it
                 },
                 onSendClick = {
                     if (question.isNotEmpty()) {
-                        jeanoChatViewModel.sendQuestion(question)
+                        jeanoChatViewModel.sendLeeQuestion(question)
                         question = ""
                     }else{
                         scope.launch {
@@ -183,14 +173,11 @@ navController: NavController,
                     }
                 }
             )
-
         }
     }
     //Logic sa bottomsheet
     if (openBottomSheet){
         ModalBottomSheet(
-            modifier = Modifier,
-            containerColor = MidnightDusk_Background,
             onDismissRequest = {
                 openBottomSheet = false
                 isActionIconEnabled = true
@@ -200,88 +187,57 @@ navController: NavController,
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
-                    .background(MidnightDusk_Background),
+                    .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
-                BottomSheetLayout(
-                    navController = navController,
-                    isIconModelenabled = isIconModelenabled,
-                    openBottomSheet = openBottomSheet,
-                    onIconModelClick1 = {
-
-                    },
-                    onIconModelClick2 = {
+                Text(
+                    text = "A.I models",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 20.dp),
+                    textAlign = TextAlign.Start,
+                    fontFamily = IntroFamily)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(30.dp, alignment = Alignment.CenterHorizontally),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconModelWithText(image = painterResource(R.drawable.jeano), title = "Jeano", navController = navController,isClickable = isIconModelenabled ){
                         isIconModelenabled = false
-                        openBottomSheet = false
-                        navController.navigate(Screens.BreaihChatScreen.route){
-                            popUpTo(Screens.JeanoChatScreen.route){
-                                inclusive = true
-                            }
-                        }
-                    },
-                    onIconModelClick3 = {
-                        isIconModelenabled = false
-                        openBottomSheet = false
-                        navController.navigate(Screens.LeeChatScreen.route){
-                            popUpTo(Screens.JeanoChatScreen.route){
-                                inclusive = true
-                            }
-                        }
-                    },
-                    OnDevelopersClicked = {
-                        openBottomSheet = false
-                        navController.navigate(Screens.DevelopersScreen.route){
-                            popUpTo(Screens.JeanoChatScreen.route){
+                        navController.navigate(Screens.JeanoChatScreen.route){
+                            popUpTo(Screens.LeeChatScreen.route){
                                 inclusive = true
                             }
                         }
                     }
+                    IconModelWithText(image = painterResource(R.drawable.breiah), title = "Breaih", navController = navController, isClickable = isIconModelenabled ){
+                        isIconModelenabled = false
+                        openBottomSheet = false
+                        navController.navigate(Screens.BreaihChatScreen.route){
+                            popUpTo(Screens.LeeChatScreen.route){
+                                inclusive = true
+                            }
+                        }
+
+                    }
+                    IconModelWithText(image = painterResource(R.drawable.lee), title = "Lee", navController = navController, isClickable = isIconModelenabled ){
+                        isIconModelenabled = false
 
 
-                )
 
+                    }
+
+                }
             }
         }
     }
 }
-
 @Composable
-fun IconModelWithText(image: Painter, title: String, navController: NavController, isClickable: Boolean, onIconModelClick:()->Unit){
-    Column(
-        modifier = Modifier
-            .wrapContentSize()
-            .clickable(
-                enabled = isClickable,
-                onClick = onIconModelClick),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Image(
-            painter = image,
-            contentDescription = "profiles",
-            modifier = Modifier
-                .size(80.dp)
-                .clip(CircleShape),
-
-        )
-        Text(
-            text = title,
-            fontFamily = PoppinsFamily,
-            color = White,
-            fontSize = 18.sp
-        )
-
-    }
-
-}
-
-
-@Composable
-fun MessageList(
+fun LeeMessageList(
     modifier: Modifier = Modifier,
-    messageList: List<MessageModel>,
+    messageList: List<LeeMessageModel>,
     isTyping: Boolean
     // listState: LazyListState // Keep this if you added scrolling logic
 ) {
@@ -331,11 +287,11 @@ fun MessageList(
                                     bottom = 8.dp
                                 )
                                 .clip(RoundedCornerShape(16.dp))
-                                .background(MidnightDusk_GreenAccent) // Model background color
+                                .background(YotsubaYellow) // Model background color
                                 .padding(horizontal = 12.dp, vertical = 8.dp) // Inner padding
                         ) {
                             Text(
-                                text = "Jeano is typing...", // The indicator text
+                                text = "Lee is typing...", // The indicator text
                                 fontWeight = FontWeight.W500,
                                 fontFamily = PoppinsFamily,
                                 color = White, // Changed back to White for consistency with bubbles
@@ -350,15 +306,13 @@ fun MessageList(
             // --- Display Actual Messages AFTER typing indicator in code ---
             // These will appear visually ABOVE the typing indicator
             items(messageList.reversed()) { message ->
-                MessageRow(message) // Pass only the message model
+                LeeMessageRow(message) // Pass only the message model
             }
         }
     }
 }
-
-
 @Composable
-fun MessageRow(messageModel: MessageModel){
+fun LeeMessageRow(messageModel: LeeMessageModel){
     var isModel = messageModel.role == "model"
     Row(
         verticalAlignment = Alignment.CenterVertically
@@ -372,7 +326,7 @@ fun MessageRow(messageModel: MessageModel){
                     .align(if (isModel) Alignment.BottomStart else Alignment.BottomEnd)
                     .padding(start = if (isModel) 8.dp else 70.dp, end = if (isModel) 70.dp else 8.dp, top = 8.dp, bottom = 8.dp)
                     .clip(if (isModel) RoundedCornerShape(topStart = 10f, topEnd = 48f, bottomStart = 48f, bottomEnd = 48f) else RoundedCornerShape(topStart = 48f, topEnd = 10f, bottomStart = 48f, bottomEnd = 48f))
-                    .background(if (isModel) MidnightDusk_GreenAccent else MidnightDusk_PinkAccent)
+                    .background(if (isModel) YotsubaYellow else YotsubaPeach)
                     .padding(16.dp)
             ){
                 SelectionContainer {
@@ -380,7 +334,7 @@ fun MessageRow(messageModel: MessageModel){
                         text = messageModel.message,
                         fontWeight = FontWeight.W500,
                         fontFamily = PoppinsFamily,
-                        color = White
+                        color = if (isModel) YotsubaDarkBackground else White,
                     )
                 }
             }
@@ -388,15 +342,14 @@ fun MessageRow(messageModel: MessageModel){
 
     }
 }
-
 @Composable
-fun TextFieldWithSendButton(question : String, onValueChange:(String)-> Unit, onSendClick:()->Unit) {
+fun LeeTextFieldWithSendButton(question : String, onValueChange:(String)-> Unit, onSendClick:()->Unit) {
     var focusManager = LocalFocusManager.current
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MidnightDusk_Background),
+            .background(YotsubaDarkBackground),
         verticalAlignment = Alignment.CenterVertically
     ) {
         OutlinedTextField(
@@ -406,9 +359,9 @@ fun TextFieldWithSendButton(question : String, onValueChange:(String)-> Unit, on
             value = question,
             onValueChange = onValueChange,
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MidnightDusk_PinkAccent,
-                unfocusedBorderColor = MidnightDusk_PinkAccent,
-                cursorColor = MidnightDusk_PinkAccent
+                focusedBorderColor = YotsubaPeach,
+                unfocusedBorderColor = YotsubaPeach,
+                cursorColor = YotsubaPeach
             ),
             shape = RoundedCornerShape(100f),
             textStyle = TextStyle(
@@ -436,18 +389,15 @@ fun TextFieldWithSendButton(question : String, onValueChange:(String)-> Unit, on
             Icon(
                 imageVector = Icons.AutoMirrored.Rounded.Send,
                 contentDescription = "Send",
-                tint = MidnightDusk_PinkAccent
+                tint = YotsubaPeach
             )
         }
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
-fun PreviewJeanoChatScreen(){
-    JeanoTheme {
-        val navController = rememberNavController()
-        JeanoChatScreen(navController)
-    }
+fun PreviewLeeScreen(){
+    val navController = rememberNavController()
+    LeeChatScreen(navController)
 }

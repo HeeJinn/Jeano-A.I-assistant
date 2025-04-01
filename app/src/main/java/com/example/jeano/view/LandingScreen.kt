@@ -29,6 +29,8 @@ import com.example.jeano.navigations.Screens
 import com.example.jeano.ui.theme.BacksoFamily
 import com.example.jeano.ui.theme.ChinaPink
 import com.example.jeano.ui.theme.LavenderBlush
+import com.example.jeano.ui.theme.MidnightDusk_Background
+import com.example.jeano.ui.theme.MidnightDusk_PinkAccent
 import com.example.jeano.ui.theme.OldMauve
 import com.example.jeano.ui.theme.PoppinsFamily
 import com.example.jeano.ui.theme.White
@@ -38,14 +40,14 @@ fun LandingScreen(navController: NavController){
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.primary),
+            .background(Color(MidnightDusk_Background.value)),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
         Text(
             text = "Jeano",
             fontFamily = BacksoFamily,
-            color = Color(White.value),
+            color = Color(MidnightDusk_PinkAccent.value),
             fontSize = 60.sp
         )
         Text(
@@ -65,8 +67,8 @@ fun LandingScreen(navController: NavController){
                 .width(250.dp),
             shape = RoundedCornerShape(10.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(LavenderBlush.value),
-                contentColor = Color(White.value),
+                containerColor = Color(MidnightDusk_PinkAccent.value),
+
             ),
             border = null,
             onClick = {
@@ -78,7 +80,7 @@ fun LandingScreen(navController: NavController){
                 fontFamily = PoppinsFamily,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(ChinaPink.value)
+                color = Color(White.value)
             )
         }
 
