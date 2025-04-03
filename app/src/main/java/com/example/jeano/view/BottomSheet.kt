@@ -73,7 +73,7 @@ fun BottomSheetLayout(navController: NavController, isIconModelenabled: Boolean,
 
                 }
             IconModelWithText(image = painterResource(R.drawable.lee), title = "Lee", navController = navController, isClickable = isIconModelenabled ){
-                onIconModelClick3
+                onIconModelClick3()
                 }
 
             }
