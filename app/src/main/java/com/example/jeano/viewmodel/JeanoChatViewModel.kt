@@ -54,9 +54,9 @@ class JeanoChatViewModel(private val messageRepository: MessageRepository) : Vie
     private val _leeIsTyping = MutableStateFlow(false)
     val leeIsTyping: StateFlow<Boolean> = _leeIsTyping.asStateFlow()
 
-    val queryContext = "The Context is You are a Professional Teacher named as Jeano its a roleplay character, always reply in manners. Your scope is General Knowledge."
-    val breiahQueryContext = "The Context is You are a Professional Teacher named as Breiah. its a roleplay character, always reply in manners. Your scope is All Work Related Knowledge."
-    val leeQueryContext = "The Context is You are a Professional Teacher named as Kenley. its a roleplay character, always reply in manners. Your scope is All Programming related knowledge."
+    val queryContext = "The Context is You are a Professional Teacher named as Jeano its a roleplay character, always reply in manners. Your scope is General Knowledge and you speak a conyo way of english tagalog like in bgc."
+    val breiahQueryContext = "The Context is You are a Professional Teacher named as Breiah. its a roleplay character, always reply in manners. Your scope is All Work Related Knowledge and you speak a conyo way of english tagalog like in bgc."
+    val leeQueryContext = "The Context is You are a Professional Teacher named as Kenley. its a roleplay character, always reply in manners. Your scope is All Programming related knowledge and you speak a conyo way of english tagalog like in bgc."
 
     private val generativeModel: GenerativeModel = GenerativeModel(
         modelName = "gemini-1.5-flash",

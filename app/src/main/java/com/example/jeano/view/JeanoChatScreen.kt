@@ -191,7 +191,6 @@ navController: NavController,
 
         }
     }
-    //Logic sa bottomsheet
     if (openBottomSheet){
         ModalBottomSheet(
             modifier = Modifier,
@@ -290,74 +289,68 @@ fun MessageList(
     modifier: Modifier = Modifier,
     messageList: List<MessageModel>,
     isTyping: Boolean
-    // listState: LazyListState // Keep this if you added scrolling logic
 ) {
-    // Show empty state only if the list is empty AND the model isn't typing
+
     if (messageList.isEmpty() && !isTyping) {
         Column(
-            modifier = modifier.fillMaxSize(), // Use the modifier containing weight
+            modifier = modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(id = R.drawable.notext), // Ensure this drawable exists
+                painter = painterResource(id = R.drawable.notext),
                 modifier = Modifier.size(150.dp).padding(bottom = 16.dp),
                 contentDescription = "No messages yet"
             )
             Text(
                 text = "Start a conversation",
-                fontFamily = BacksoFamily, // Your custom font
-                color = White, // Your custom color
-                style = MaterialTheme.typography.bodyLarge // Use theme typography
+                fontFamily = BacksoFamily,
+                color = White,
+                style = MaterialTheme.typography.bodyLarge
             )
         }
     } else {
-        // Display the list of messages and potentially the typing indicator
+
         LazyColumn(
-            modifier = modifier.padding(horizontal = 8.dp), // Apply modifier and padding
-            reverseLayout = true, // New items appear at the bottom, scrolls from bottom
-            // state = listState // Pass state if using scrolling logic
+            modifier = modifier.padding(horizontal = 8.dp),
+            reverseLayout = true,
         ) {
-            // --- Conditionally Display Typing Indicator FIRST in code ---
-            // So reverseLayout places it at the BOTTOM visually (index 0)
+
             if (isTyping) {
-                item { // Typing indicator is conceptually the 'first' item
+                item {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 8.dp), // Padding around typing indicator
-                        horizontalArrangement = Arrangement.Start // Model always types from start
+                            .padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.Start
                     ) {
                         Box(
                             modifier = Modifier
-                                // Styling similar to a model message bubble
                                 .padding(
                                     start = 8.dp,
-                                    end = 70.dp, // Asymmetric padding
+                                    end = 70.dp,
                                     top = 8.dp,
                                     bottom = 8.dp
                                 )
                                 .clip(RoundedCornerShape(16.dp))
-                                .background(MidnightDusk_GreenAccent) // Model background color
-                                .padding(horizontal = 12.dp, vertical = 8.dp) // Inner padding
+                                .background(MidnightDusk_GreenAccent)
+                                .padding(horizontal = 12.dp, vertical = 8.dp)
                         ) {
                             Text(
-                                text = "Jeano is typing...", // The indicator text
+                                text = "Jeano is typing...",
                                 fontWeight = FontWeight.W500,
                                 fontFamily = PoppinsFamily,
-                                color = White, // Changed back to White for consistency with bubbles
+                                color = White,
 
                             )
                         }
                     }
-                    Spacer(modifier = Modifier.height(4.dp)) // Space after typing indicator
+                    Spacer(modifier = Modifier.height(4.dp))
                 }
             }
 
-            // --- Display Actual Messages AFTER typing indicator in code ---
-            // These will appear visually ABOVE the typing indicator
             items(messageList.reversed()) { message ->
-                MessageRow(message) // Pass only the message model
+                MessageRow(message)
             }
         }
     }
