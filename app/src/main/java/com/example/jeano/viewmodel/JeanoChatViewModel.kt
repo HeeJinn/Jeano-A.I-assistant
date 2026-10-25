@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 
-const val API_KEY = "AIzaSyAqRf0UBDJbabBf2AhooL6YHN7OI4k2AoU"
+private val API_KEY = com.example.jeano.BuildConfig.GEMINI_API_KEY
 
 class JeanoChatViewModel(private val messageRepository: MessageRepository) : ViewModel() {
 
@@ -59,7 +59,7 @@ class JeanoChatViewModel(private val messageRepository: MessageRepository) : Vie
     val leeQueryContext = "The Context is You are a Professional Teacher named as Kenley. its a roleplay character, always reply in manners. Your scope is All Programming related knowledge and you speak a conyo way of english tagalog like in bgc."
 
     private val generativeModel: GenerativeModel = GenerativeModel(
-        modelName = "gemini-1.5-flash",
+        modelName = "gemini-2.5-flash",
         apiKey = API_KEY,
     )
 
